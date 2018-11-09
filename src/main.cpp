@@ -173,22 +173,15 @@ void waitForButtonAndCountDown()
   }
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);
-
-
 }
 
-/*
-  Takes desired length of timeout and sets the global variable to hold the value.
-*/
 
+//Takes desired length of timeout and sets the global variable to hold the value.
 void startTimer(unsigned long timeout) {
   nextTimeout = millis() + timeout;
 }
 
-/*
-  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
-*/
-
+//  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
 bool isTimerExpired() {
   bool timerHasExpired = false;
 
@@ -201,7 +194,6 @@ bool isTimerExpired() {
 }
 
 // Speed functions
-
 void setForwardSpeed(ForwardSpeed speed)
 {
   Serial.println("YES");
@@ -233,8 +225,6 @@ int getForwardSpeed()
   return speed;
 }
 
-
-
 // sound horn and accelerate on contact -- fight or flight
 void on_contact_made()
 {
@@ -255,7 +245,6 @@ void on_contact_lost()
   in_contact = false;
   setForwardSpeed(SearchSpeed);
 }
-
 
 // check for contact, but ignore readings immediately after turning or losing contact
 bool check_for_contact()
