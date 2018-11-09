@@ -488,5 +488,3 @@ void loop()
     break;
   }
 }
-
-if else is a sentense
