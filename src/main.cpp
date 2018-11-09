@@ -7,19 +7,17 @@
 
 // Define pins to variable names
 const int ON_BOARD_LED = 13;
-
 const int NUM_SENSORS = 6;
 unsigned int sensor_values[NUM_SENSORS];
 
 // this might need to be tuned for different lighting conditions, surfaces, etc.
 const int QTR_THRESHOLD = 1500; // microseconds
 
-// Speeds: define different speed levels
-// 0-400 : 400 Full speed
-
 //Value 1 for normal speed, value 2 for testing speed.
 const int SPEED_CONTROL = 1;
 
+// Speeds: define different speed levels
+// 0-400 : 400 Full speed
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
 const int REVERSE_SPEED =      250/SPEED_CONTROL;
@@ -51,8 +49,6 @@ enum ForwardSpeed { SearchSpeed, SustainedSpeed, FullSpeed, SlowSpeed };
 ForwardSpeed _forwardSpeed;  // current forward speed setting
 unsigned long full_speed_start_time;
 const int FULL_SPEED_DURATION_LIMIT   = 250;  // ms
-
-
 
 // RunningAverage class
 // based on RunningAverage library for Arduino
@@ -109,9 +105,6 @@ class Accelerometer : public LSM303
 
 Accelerometer lsm303;
 boolean in_contact;  // set when accelerometer detects contact with opposing robot
-
-// –––––––––––––––––––––––––––––––––––––
-
 
 ZumoBuzzer buzzer;
 const char sound_effect[] PROGMEM = "O4 T100 V15 L4 MS g12>c12>e12>G6>E12 ML>G2"; // "charge" melody
