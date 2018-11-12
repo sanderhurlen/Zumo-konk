@@ -49,6 +49,7 @@ const int XY_ACCELERATION_THRESHOLD = 2200;  // for detection of contact (~16000
 
 enum ForwardSpeed { SearchSpeed, SustainedSpeed, FullSpeed, SlowSpeed };
 ForwardSpeed _forwardSpeed;  // current forward speed setting
+
 unsigned long full_speed_start_time;
 const int FULL_SPEED_DURATION_LIMIT   = 250;  // ms
 
@@ -121,8 +122,6 @@ Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 
 
-unsigned int nextTimeout = 0;
-
 // STATES
 
 const int S_STANDBY = 0;
@@ -135,8 +134,6 @@ int state = S_STANDBY;
 void setup()
 {
   Wire.begin();
-
-  digitalWrite(6, HIGH);
 
   // Initiate LSM303
   lsm303.init();
@@ -173,22 +170,17 @@ void waitForButtonAndCountDown()
   }
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);
-
-
 }
 
-/*
-  Takes desired length of timeout and sets the global variable to hold the value.
-*/
+<<<<<<< HEAD
+=======
 
+//Takes desired length of timeout and sets the global variable to hold the value.
 void startTimer(unsigned long timeout) {
   nextTimeout = millis() + timeout;
 }
 
-/*
-  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
-*/
-
+//  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
 bool isTimerExpired() {
   bool timerHasExpired = false;
 
@@ -200,12 +192,10 @@ bool isTimerExpired() {
   return timerHasExpired;
 }
 
+>>>>>>> aa4ac909ef166ba061a3f154fc8d3945dcdea355
 // Speed functions
-
 void setForwardSpeed(ForwardSpeed speed)
 {
-  Serial.println("YES");
-  Serial.println(speed);
   _forwardSpeed = speed;
   if (speed == FullSpeed) {
     full_speed_start_time = loop_start_time;
@@ -233,8 +223,6 @@ int getForwardSpeed()
   return speed;
 }
 
-
-
 // sound horn and accelerate on contact -- fight or flight
 void on_contact_made()
 {
@@ -242,9 +230,7 @@ void on_contact_made()
   Serial.println();
 
   in_contact = true;
-  Serial.println("IN CONTACT = TRUE");
   contact_made_time = loop_start_time;
-  Serial.println(contact_made_time);
   setForwardSpeed(FullSpeed);
   buzzer.playFromProgramSpace(sound_effect);
 }
@@ -255,7 +241,6 @@ void on_contact_lost()
   in_contact = false;
   setForwardSpeed(SearchSpeed);
 }
-
 
 // check for contact, but ignore readings immediately after turning or losing contact
 bool check_for_contact()
@@ -278,8 +263,9 @@ void Accelerometer::enable(void)
   // Normal power mode, all axes enabled
   writeAccReg(LSM303::CTRL_REG1_A, 0x27);
 
-  if (getDeviceType() == LSM303::device_DLHC)
-  writeAccReg(LSM303::CTRL_REG4_A, 0x08); // DLHC: enable high resolution mode
+  if (getDeviceType() == LSM303::device_DLHC) {
+    writeAccReg(LSM303::CTRL_REG4_A, 0x08); // DLHC: enable high resolution mode
+  }
 }
 
 void Accelerometer::getLogHeader(void)
@@ -299,7 +285,7 @@ void Accelerometer::readAcceleration(unsigned long timestamp)
 
   ra_x.addValue(last.x);
   ra_y.addValue(last.y);
-  }
+}
 
 float Accelerometer::len_xy() const
 {
