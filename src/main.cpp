@@ -14,7 +14,7 @@ unsigned int sensor_values[NUM_SENSORS];
 const int QTR_THRESHOLD = 1500; // microseconds
 
 //Value 1 for normal speed, value 2 for testing speed.
-const int SPEED_CONTROL = 1;
+const int SPEED_CONTROL = 2;
 
 // Speeds: define different speed levels
 // 0-400 : 400 Full speed
@@ -165,30 +165,6 @@ void waitForButtonAndCountDown()
   buzzer.playNote(NOTE_G(4), 500, 15);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 180cf39f0afefb63f45232e2fe9e1c9869a21f46
-
-//Takes desired length of timeout and sets the global variable to hold the value.
-void startTimer(unsigned long timeout) {
-  nextTimeout = millis() + timeout;
-}
-
-//  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
-bool isTimerExpired() {
-  bool timerHasExpired = false;
-
-  if (millis() > nextTimeout) {
-    timerHasExpired = true;
-  } else {
-    timerHasExpired = false;
-  }
-  return timerHasExpired;
-}
-
->>>>>>> aa4ac909ef166ba061a3f154fc8d3945dcdea355
 // Speed functions
 void setForwardSpeed(ForwardSpeed speed)
 {
@@ -481,5 +457,3 @@ void loop()
     break;
   }
 }
-
-if else is a sentense
