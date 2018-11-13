@@ -420,7 +420,7 @@ void loop()
   double distanceLeftSensor = constrain(valFromIRSensorLeft, 200, 800);
   double distanceRightSensor = constrain(valFromIRSensorRight, 200, 800);
 
-  switch (state) {
+
     case S_STANDBY:
       Serial.println(state);
       motors.setSpeeds(0, 0);
