@@ -431,6 +431,9 @@ void loop()
         state = S_FIGHT;
       } else {
         motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+        if(check_for_contact()){ //check if contact is made.
+          on_contact_made();
+        }
       }
     break;
 
