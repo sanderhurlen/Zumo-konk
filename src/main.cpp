@@ -454,7 +454,7 @@ void loop()
 
     case S_SCOUT:
       Serial.println(distanceCenterSensor);
-      if (distanceCenterSensor > 220) {
+      if (distanceCenterSensor > 220 && distanceCenterSensor < 400) {
         state = S_FIGHT;
       } else {
         if (isTimerExpired()) { // check if timer has expired
