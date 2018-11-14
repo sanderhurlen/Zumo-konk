@@ -29,7 +29,7 @@ const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 
 // Duration : Timing constants
-int nextTimeout = 0;
+unsigned long nextTimeout = 0;
 const int REVERSE_DURATION =   300; // ms
 const int TURN_DURATION =      250; // ms
 
@@ -457,7 +457,7 @@ void loop()
       if (distanceCenterSensor > 220) {
         state = S_FIGHT;
       } else {
-        if (timerHasExpired()) { // check if timer has expired
+        if (isTimerExpired()) { // check if timer has expired
           state = S_FIGHT;
         } else { // if timer has not expired -> scout
           motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
