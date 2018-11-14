@@ -29,6 +29,7 @@ const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 
 // Duration : Timing constants
+unsigned long nextTimeout = 0;
 const int REVERSE_DURATION =   300; // ms
 const int TURN_DURATION =      250; // ms
 
@@ -120,7 +121,7 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 // STATES
 
 const int S_STANDBY = 0;
-const int S_FLIGHT = 1;
+const int S_FIGHT = 1;
 const int S_SCOUT = 2;
 const int S_TEST_SENSOR = 3;
 
@@ -376,6 +377,30 @@ void turn(char direction, bool randomize) {
   last_turn_time = millis();
 }
 
+/*
+  Timer functions:
+  Takes desired length of timeout and sets the global variable to hold the value.
+*/
+
+void startTimer(unsigned long timeout) {
+  nextTimeout = millis() + timeout;
+}
+
+/*
+  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
+*/
+
+bool isTimerExpired() {
+  bool timerHasExpired = false;
+
+  if (millis() > nextTimeout) {
+    timerHasExpired = true;
+  } else {
+    timerHasExpired = false;
+  }
+  return timerHasExpired;
+}
+
 
 void loop()
 {
@@ -398,19 +423,21 @@ void loop()
       motors.setSpeeds(0, 0);
       waitForButtonAndCountDown();
       last_turn_time = millis();
-      state = S_FLIGHT;
+      state = S_FIGHT;
     break;
 
-    case S_FLIGHT:
+    case S_FIGHT:
       if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
         // if leftmost sensor detects line, reverse and turn to the right
         turn(RIGHT, true);
+        startTimer(1500);
         state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
         // if rightmost sensor detects line, reverse and turn to the left
         turn(LEFT, true);
+        startTimer(1500);
         state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
@@ -427,10 +454,14 @@ void loop()
 
     case S_SCOUT:
       Serial.println(distanceCenterSensor);
-      if (distanceCenterSensor > 300) {
-        state = S_FLIGHT;
+      if (distanceCenterSensor > 220 && distanceCenterSensor < 400) {
+        state = S_FIGHT;
       } else {
-        motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+        if (isTimerExpired()) { // check if timer has expired
+          state = S_FIGHT;
+        } else { // if timer has not expired -> scout
+          motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+        }
       }
     break;
 
