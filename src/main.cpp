@@ -2,6 +2,9 @@
 #include <Wire.h>
 #include <ZumoShield.h>
 
+// Debug: true for debugging
+bool DEBUG = true;
+
 //Quick shift variable for edge color. Black edge = > , white edge = <
 #define COLOR_EDGE >
 
@@ -21,31 +24,30 @@ const int SPEED_CONTROL = 1;
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
 const int REVERSE_SPEED =      250/SPEED_CONTROL;
-const int TURN_SPEED =         200/SPEED_CONTROL;
-const int FORWARD_SPEED =      100/SPEED_CONTROL;
-const int SEARCH_SPEED =       100/SPEED_CONTROL;
+const int TURN_SPEED =         300/SPEED_CONTROL;
+const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 
 // Duration : Timing constants
 const int REVERSE_DURATION =   300; // ms
-const int TURN_DURATION =      350; // ms
+const int TURN_DURATION =      250; // ms
 
 // Timing for accelerometer
 unsigned long loop_start_time;
 unsigned long last_turn_time;
 unsigned long contact_made_time;
-const int MIN_DELAY_AFTER_TURN     =    400;  // ms = min delay before detecting contact event
-const int MIN_DELAY_BETWEEN_CONTACTS =  1000;  // ms = min delay between detecting new contact event
+const int MIN_DELAY_AFTER_TURN     =    650;  // ms = min delay before detecting contact event
+const int MIN_DELAY_BETWEEN_CONTACTS =  1500;  // ms = min delay between detecting new contact event
 
 // Directions
 const int RIGHT = 1;
 const int LEFT = -1;
 
 // Accelerometer Settings
-const int RA_SIZE = 3;  // number of readings to include in running average of accelerometer readings
-const int XY_ACCELERATION_THRESHOLD = 2200;  // for detection of contact (~16000 = magnitude of acceleration due to gravity)
+const int RA_SIZE = 2;  // number of readings to include in running average of accelerometer readings
+const int XY_ACCELERATION_THRESHOLD = 2000;  // for detection of contact (~16000 = magnitude of acceleration due to gravity)
 
-enum ForwardSpeed { SearchSpeed, SustainedSpeed, FullSpeed, SlowSpeed };
+enum ForwardSpeed { FlightSpeed, SearchSpeed };
 ForwardSpeed _forwardSpeed;  // current forward speed setting
 
 unsigned long full_speed_start_time;
@@ -120,6 +122,7 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 const int S_STANDBY = 0;
 const int S_FLIGHT = 1;
 const int S_SCOUT = 2;
+const int S_TEST_SENSOR = 3;
 
 int state = S_STANDBY;
 
@@ -144,7 +147,7 @@ void setup()
   in_contact = false;  // 1 if contact made; 0 if no contact or contact lost
   contact_made_time = 0;
   last_turn_time = millis();  // prevents false contact detection on initial acceleration
-  _forwardSpeed = SlowSpeed;
+  _forwardSpeed = SearchSpeed;
   full_speed_start_time = 0;
 }
 
@@ -165,35 +168,11 @@ void waitForButtonAndCountDown()
   buzzer.playNote(NOTE_G(4), 500, 15);
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 180cf39f0afefb63f45232e2fe9e1c9869a21f46
-
-//Takes desired length of timeout and sets the global variable to hold the value.
-void startTimer(unsigned long timeout) {
-  nextTimeout = millis() + timeout;
-}
-
-//  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
-bool isTimerExpired() {
-  bool timerHasExpired = false;
-
-  if (millis() > nextTimeout) {
-    timerHasExpired = true;
-  } else {
-    timerHasExpired = false;
-  }
-  return timerHasExpired;
-}
-
->>>>>>> aa4ac909ef166ba061a3f154fc8d3945dcdea355
 // Speed functions
 void setForwardSpeed(ForwardSpeed speed)
 {
   _forwardSpeed = speed;
-  if (speed == FullSpeed) {
+  if (speed == FlightSpeed) {
     full_speed_start_time = loop_start_time;
   }
 }
@@ -203,14 +182,11 @@ int getForwardSpeed()
   int speed;
   switch (_forwardSpeed)
   {
-    case FullSpeed:
+    case FlightSpeed:
       speed = FULL_SPEED;
       break;
-    case SlowSpeed:
-      speed = FORWARD_SPEED;
-      break;
-    case SustainedSpeed:
-      speed = SUSTAINED_SPEED;
+    case SearchSpeed:
+      speed = SEARCH_SPEED;
       break;
     default:
       speed = SEARCH_SPEED;
@@ -222,18 +198,18 @@ int getForwardSpeed()
 // sound horn and accelerate on contact -- fight or flight
 void on_contact_made()
 {
-  Serial.print("contact made");
-  Serial.println();
-
+  if (DEBUG) {
+    Serial.println("contact made");
+  }
   in_contact = true;
   contact_made_time = loop_start_time;
-  setForwardSpeed(FullSpeed);
-  buzzer.playFromProgramSpace(sound_effect);
+  setForwardSpeed(FlightSpeed);
 }
 
 // reset forward speed
 void on_contact_lost()
 {
+  lsm303.readAcceleration(loop_start_time);
   in_contact = false;
   setForwardSpeed(SearchSpeed);
 }
@@ -266,8 +242,7 @@ void Accelerometer::enable(void)
 
 void Accelerometer::getLogHeader(void)
 {
-  Serial.print("millis    x      y     len     dir  | len_avg  dir_avg  |  avg_len");
-  Serial.println();
+  Serial.println("millis    x      y     len     dir  | len_avg  dir_avg  |  avg_len");
 }
 
 void Accelerometer::readAcceleration(unsigned long timestamp)
@@ -408,78 +383,61 @@ void loop()
   loop_start_time = millis();
   lsm303.readAcceleration(loop_start_time);
   sensors.read(sensor_values);
-  int valFromIRSensorLeft = analogRead(A0);
-  int valFromIRSensorRight = analogRead(A1);
-  double distanceLeftSensor = constrain(valFromIRSensorLeft, 200, 800);
-  double distanceRightSensor = constrain(valFromIRSensorRight, 200, 800);
+  int valFromIRSensorCenter = analogRead(A0);
+  //int valFromIRSensorLeft = analogRead(A0);
+  //int valFromIRSensorRight = analogRead(A1);
+  //double distanceLeftSensor = constrain(valFromIRSensorLeft, 200, 800);
+  //double distanceRightSensor = constrain(valFromIRSensorRight, 200, 800);
+  double distanceCenterSensor = constrain(valFromIRSensorCenter, 200, 800);
+
+  int speed = getForwardSpeed();
 
   switch (state) {
     case S_STANDBY:
       Serial.println(state);
       motors.setSpeeds(0, 0);
       waitForButtonAndCountDown();
+      last_turn_time = millis();
       state = S_FLIGHT;
     break;
 
     case S_FLIGHT:
-      Serial.println(state);
-      Serial.print("Distance is: Left: ");
-      Serial.print(distanceLeftSensor);
-      Serial.print("Right: ");
-      Serial.print(distanceRightSensor);
-      Serial.print(" in state: ");
-      Serial.println(state);
-      delay(10);
-/*
-      if (distanceLeftSensor < 800) {
-        int volume = map(distanceLeftSensor, 125, 0, 3, 15);
-        buzzer.playNote(NOTE_G(4), 500, volume); //Volume jglp kdo
-      } else {
-        motors.setSpeeds(0, 0);
-        //motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-      }*/
-    break;
-
-    case S_SCOUT:
-
-      // https://acroname.com/articles/linearizing-sharp-ranger-data
-
       if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
         // if leftmost sensor detects line, reverse and turn to the right
         turn(RIGHT, true);
+        state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
         // if rightmost sensor detects line, reverse and turn to the left
         turn(LEFT, true);
+        state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else {
-        // otherwise, go straight
-        //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-        Serial.print("Distance is: ");
-        Serial.print(distanceLeftSensor);
-        Serial.print(" in state: ");
-        Serial.println(state);
-        delay(10);
-
+        // If robot is inside borders. Check for contact or go straight forward
         if (check_for_contact()) {
           on_contact_made();
-        }
-
-        if (distanceLeftSensor < 800) {
-          int volume = map(distanceLeftSensor, 125, 0, 3, 15);
-          buzzer.playNote(NOTE_G(4), 500, volume); //Volume jglp kdo
-          int speed = getForwardSpeed();
-          motors.setSpeeds(speed, speed);
         } else {
-          motors.setSpeeds(0, 0);
-          //motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+          motors.setSpeeds(speed, speed);
         }
-      }
 
+      }
+    break;
+
+    case S_SCOUT:
+      Serial.println(distanceCenterSensor);
+      if (distanceCenterSensor > 300) {
+        state = S_FLIGHT;
+      } else {
+        motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+      }
+    break;
+
+    case S_TEST_SENSOR:
+    if (DEBUG) {
+      Serial.println(distanceCenterSensor);
+    }
     break;
   }
 }
-
-if else is a sentense
