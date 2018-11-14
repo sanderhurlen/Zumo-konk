@@ -381,7 +381,6 @@ void turn(char direction, bool randomize) {
 
 void loop()
 {
-
   loop_start_time = millis();
   lsm303.readAcceleration(loop_start_time);
   sensors.read(sensor_values);
@@ -457,7 +456,9 @@ void loop()
     break;
   }
   if(DEBUG){
-    Serial.print("Loop run time");
-    Serial.println(loop_start_time - millis());
+    Serial.print("Loop run time is ");
+    unsigned long loopRunTime = millis();
+    unsigned long timeNow = loopRunTime - loop_start_time;
+    Serial.println(timeNow);
   }
 }
