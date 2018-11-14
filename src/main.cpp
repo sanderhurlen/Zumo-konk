@@ -426,9 +426,12 @@ void loop()
         if (check_for_contact()) {
           on_contact_made();
         } else {
-          motors.setSpeeds(speed, speed);
+          if (distanceCenterSensor > 220 && distanceCenterSensor < 400) {
+            motors.setSpeeds(speed, speed);
+          } else {
+            state = S_SCOUT;
+          }
         }
-
       }
     break;
 
