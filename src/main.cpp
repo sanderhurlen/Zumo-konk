@@ -120,7 +120,7 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 // STATES
 
 const int S_STANDBY = 0;
-const int S_FLIGHT = 1;
+const int S_FIGHT = 1;
 const int S_SCOUT = 2;
 const int S_TEST_SENSOR = 3;
 
@@ -398,10 +398,10 @@ void loop()
       motors.setSpeeds(0, 0);
       waitForButtonAndCountDown();
       last_turn_time = millis();
-      state = S_FLIGHT;
+      state = S_FIGHT;
     break;
 
-    case S_FLIGHT:
+    case S_FIGHT:
       if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
         // if leftmost sensor detects line, reverse and turn to the right
         turn(RIGHT, true);
@@ -427,8 +427,8 @@ void loop()
 
     case S_SCOUT:
       Serial.println(distanceCenterSensor);
-      if (distanceCenterSensor > 300) {
-        state = S_FLIGHT;
+      if (distanceCenterSensor > 220) {
+        state = S_FIGHT;
       } else {
         motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
       }
