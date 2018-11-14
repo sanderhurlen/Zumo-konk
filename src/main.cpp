@@ -378,7 +378,7 @@ void turn(char direction, bool randomize) {
 }
 
 /*
-  Timer functions: 
+  Timer functions:
   Takes desired length of timeout and sets the global variable to hold the value.
 */
 
@@ -430,12 +430,14 @@ void loop()
       if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
         // if leftmost sensor detects line, reverse and turn to the right
         turn(RIGHT, true);
+        startTimer(1500);
         state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
         // if rightmost sensor detects line, reverse and turn to the left
         turn(LEFT, true);
+        startTimer(1500);
         state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
@@ -455,7 +457,11 @@ void loop()
       if (distanceCenterSensor > 220) {
         state = S_FIGHT;
       } else {
-        motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+        if (timerHasExpired()) { // check if timer has expired
+          state = S_FIGHT;
+        } else { // if timer has not expired -> scout
+          motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+        }
       }
     break;
 
