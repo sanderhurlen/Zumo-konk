@@ -29,6 +29,7 @@ const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 
 // Duration : Timing constants
+int nextTimeout = 0;
 const int REVERSE_DURATION =   300; // ms
 const int TURN_DURATION =      250; // ms
 
@@ -374,6 +375,30 @@ void turn(char direction, bool randomize) {
   int speed = getForwardSpeed();
   motors.setSpeeds(speed, speed);
   last_turn_time = millis();
+}
+
+/*
+  Timer functions: 
+  Takes desired length of timeout and sets the global variable to hold the value.
+*/
+
+void startTimer(unsigned long timeout) {
+  nextTimeout = millis() + timeout;
+}
+
+/*
+  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
+*/
+
+bool isTimerExpired() {
+  bool timerHasExpired = false;
+
+  if (millis() > nextTimeout) {
+    timerHasExpired = true;
+  } else {
+    timerHasExpired = false;
+  }
+  return timerHasExpired;
 }
 
 
