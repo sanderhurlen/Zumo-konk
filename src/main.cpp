@@ -24,7 +24,7 @@ const int SPEED_CONTROL = 1;
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
 const int REVERSE_SPEED =      250/SPEED_CONTROL;
-const int TURN_SPEED =         300/SPEED_CONTROL;
+const int TURN_SPEED =         250/SPEED_CONTROL;
 const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 
@@ -398,7 +398,7 @@ void loop()
       motors.setSpeeds(0, 0);
       waitForButtonAndCountDown();
       last_turn_time = millis();
-      state = S_FIGHT;
+      state = S_SCOUT;
     break;
 
     case S_FIGHT:
@@ -427,7 +427,7 @@ void loop()
 
     case S_SCOUT:
       Serial.println(distanceCenterSensor);
-      if (distanceCenterSensor > 220) {
+      if (distanceCenterSensor > 220 && distanceCenterSensor < 400) {
         state = S_FIGHT;
       } else {
         motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
