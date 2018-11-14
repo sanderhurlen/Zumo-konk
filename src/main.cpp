@@ -383,10 +383,6 @@ void loop()
 {
 
   loop_start_time = millis();
-  if(DEBUG){
-    Serial.print("Loop start time");
-    Serial.println(loop_start_time);
-  };
   lsm303.readAcceleration(loop_start_time);
   sensors.read(sensor_values);
   int valFromIRSensorCenter = analogRead(A0);
@@ -439,14 +435,10 @@ void loop()
 
     case S_SCOUT:
       Serial.println(distanceCenterSensor);
-<<<<<<< HEAD
       if(DEBUG){
         Serial.println("In Scout mode");
       }
-      if (distanceCenterSensor > 220) {
-=======
       if (distanceCenterSensor > 220 && distanceCenterSensor < 400) {
->>>>>>> 4ac6bb6a48de2c9c8427c68e1925aea064675175
         state = S_FIGHT;
       } else {
         motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
@@ -465,7 +457,7 @@ void loop()
     break;
   }
   if(DEBUG){
-    Serial.print("Loop end time");
-    Serial.println(millis());
+    Serial.print("Loop run time");
+    Serial.println(loop_start_time - millis());
   }
 }
