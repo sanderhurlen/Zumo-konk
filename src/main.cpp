@@ -199,7 +199,9 @@ int getForwardSpeed()
 void on_contact_made()
 {
   if (DEBUG) {
-    Serial.println("contact made");
+    Serial.print("contact made");
+    Serial.print(" in state ");
+    Serial.println(state);
   }
   in_contact = true;
   contact_made_time = loop_start_time;
@@ -394,6 +396,9 @@ void loop()
 
   switch (state) {
     case S_STANDBY:
+      if(DEBUG){
+        Serial.println("In standby mode");
+      }
       Serial.println(state);
       motors.setSpeeds(0, 0);
       waitForButtonAndCountDown();
@@ -402,6 +407,9 @@ void loop()
     break;
 
     case S_FIGHT:
+      if(DEBUG){
+        Serial.println("In fight mode");
+      }
       if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
         // if leftmost sensor detects line, reverse and turn to the right
         turn(RIGHT, true);
@@ -427,11 +435,14 @@ void loop()
 
     case S_SCOUT:
       Serial.println(distanceCenterSensor);
+      if(DEBUG){
+        Serial.println("In Scout mode");
+      }
       if (distanceCenterSensor > 220) {
         state = S_FIGHT;
       } else {
         motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-        if(check_for_contact()){ //check if contact is made.
+        if(check_for_contact()){ //check if contact is made
           on_contact_made();
           state = S_FIGHT;
         }
@@ -440,6 +451,7 @@ void loop()
 
     case S_TEST_SENSOR:
     if (DEBUG) {
+      Serial.println("In Test sensor mode");
       Serial.println(distanceCenterSensor);
     }
     break;
