@@ -5,6 +5,9 @@
 //Quick shift variable for edge color. Black edge = > , white edge = <
 #define COLOR_EDGE >
 
+//start condition in battle mode. True if flight first, false if not.
+bool flight;
+
 // Define pins to variable names
 const int ON_BOARD_LED = 13;
 
@@ -411,7 +414,7 @@ void turn(char direction, bool randomize) {
 
 void loop()
 {
-
+//kan ikke de neste linjene flyttes til setup?
   loop_start_time = millis();
   lsm303.readAcceleration(loop_start_time);
   sensors.read(sensor_values);
@@ -419,16 +422,18 @@ void loop()
   int valFromIRSensorRight = analogRead(A1);
   double distanceLeftSensor = constrain(valFromIRSensorLeft, 200, 800);
   double distanceRightSensor = constrain(valFromIRSensorRight, 200, 800);
+//til hit?
 
 
-    case S_STANDBY:
-      Serial.println(state);
+
+//Wait for button to start battle phase
+if(waitForButtonAndCountDown() && ){
       motors.setSpeeds(0, 0);
-      waitForButtonAndCountDown();
       state = S_FLIGHT;
     break;
 
-    case S_FLIGHT:
+    if(flight){
+
       Serial.println(state);
       Serial.print("Distance is: Left: ");
       Serial.print(distanceLeftSensor);
@@ -437,6 +442,7 @@ void loop()
       Serial.print(" in state: ");
       Serial.println(state);
       delay(10);
+    }
 /*
       if (distanceLeftSensor < 800) {
         int volume = map(distanceLeftSensor, 125, 0, 3, 15);
