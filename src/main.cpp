@@ -383,6 +383,10 @@ void loop()
 {
 
   loop_start_time = millis();
+  if(DEBUG){
+    Serial.print("Loop start time");
+    Serial.println(loop_start_time);
+  };
   lsm303.readAcceleration(loop_start_time);
   sensors.read(sensor_values);
   int valFromIRSensorCenter = analogRead(A0);
@@ -455,5 +459,9 @@ void loop()
       Serial.println(distanceCenterSensor);
     }
     break;
+  }
+  if(DEBUG){
+    Serial.print("Loop end time");
+    Serial.println(millis());
   }
 }
