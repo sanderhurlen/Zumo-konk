@@ -3,7 +3,7 @@
 #include <ZumoShield.h>
 
 // Debug: true for debugging
-bool DEBUG = true;
+bool DEBUG = false;
 
 //Quick shift variable for edge color. Black edge = > , white edge = <
 #define COLOR_EDGE >
@@ -17,14 +17,14 @@ unsigned int sensor_values[NUM_SENSORS];
 const int QTR_THRESHOLD = 1500; // microseconds
 
 //Value 1 for normal speed, value 2 for testing speed.
-const int SPEED_CONTROL = 2;
+const int SPEED_CONTROL = 1;
 
 // Speeds: define different speed levels
 // 0-400 : 400 Full speed
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = -350/SPEED_CONTROL;
 const int REVERSE_SPEED =      250/SPEED_CONTROL;
-const int TURN_SPEED =         250/SPEED_CONTROL;
+const int TURN_SPEED =         100/SPEED_CONTROL;
 const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 const int STOP_SPEED = 0;
@@ -58,7 +58,7 @@ const int LEFT = -1;
 
 // Accelerometer Settings
 const int RA_SIZE = 2;  // number of readings to include in running average of accelerometer readings
-const int XY_ACCELERATION_THRESHOLD = 2000;  // for detection of contact (~16000 = magnitude of acceleration due to gravity)
+const int XY_ACCELERATION_THRESHOLD = 1700;  // for detection of contact (~16000 = magnitude of acceleration due to gravity)
 
 enum ForwardSpeed { FlightSpeed, SearchSpeed };
 ForwardSpeed _forwardSpeed;  // current forward speed setting
@@ -437,15 +437,15 @@ void loop()
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else {
+        //Stop chase if there is no target
+        if(distanceCenterSensor < 220) {
+          state = S_SCOUT;
+        }
         // If robot is inside borders. Check for contact or go straight forward
         if (check_for_contact()) {
           on_contact_made();
         } else {
-            //Stop chase if there is no target
-            if(distanceCenterSensor < 220){
-              state = S_SCOUT;
-            }
-            motors.setSpeeds(speed, speed);
+          motors.setSpeeds(speed, speed);
         }
       }
     break;
