@@ -17,16 +17,17 @@ unsigned int sensor_values[NUM_SENSORS];
 const int QTR_THRESHOLD = 1500; // microseconds
 
 //Value 1 for normal speed, value 2 for testing speed.
-const int SPEED_CONTROL = 1;
+const int SPEED_CONTROL = 2;
 
 // Speeds: define different speed levels
 // 0-400 : 400 Full speed
 const int FULL_SPEED =         400/SPEED_CONTROL;
-const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
+const int FULL_REVERSE_SPEED = -350/SPEED_CONTROL;
 const int REVERSE_SPEED =      250/SPEED_CONTROL;
 const int TURN_SPEED =         250/SPEED_CONTROL;
 const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
+const int STOP_SPEED = 0;
 
 // STATES
 
@@ -36,6 +37,9 @@ const int S_SCOUT = 2;
 const int S_TEST_SENSOR = 3;
 
 int state = S_STANDBY;
+
+//variables
+int lineHitCounter = 0;
 
 // Duration : Timing constants
 const int REVERSE_DURATION =   300; // ms
@@ -149,6 +153,7 @@ void setup()
   full_speed_start_time = 0;
 }
 
+
 void waitForButtonAndCountDown()
 {
   button.waitForPress();
@@ -223,7 +228,15 @@ bool check_for_contact()
     (loop_start_time - contact_made_time > MIN_DELAY_BETWEEN_CONTACTS);
 }
 
-
+//Function to Check if zumo is hitting border to many times within timeframe
+void checkLineHits(int lineHits, unsigned long checkTime){
+  unsigned long currentTime = millis();
+  int timeWindow = 3000;
+  int maxHits = 2;
+  if(currentTime > checkTime+timeWindow && lineHits <= maxHits){
+    setForwardSpeed(STOP_SPEED);
+  }
+}
 // class Accelerometer -- member function definitions
 
 // enable accelerometer only
@@ -409,24 +422,29 @@ void loop()
       }
       if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
         // if leftmost sensor detects line, reverse and turn to the right
-        turn(RIGHT, false);
+        //turn(RIGHT, false);
+        motors.setSpeeds(FULL_REVERSE_SPEED, FULL_REVERSE_SPEED);
+        delay(1000);
         state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
         // if rightmost sensor detects line, reverse and turn to the left
-        turn(LEFT, false);
+        //turn(LEFT, false);
+        motors.setSpeeds(FULL_REVERSE_SPEED, FULL_REVERSE_SPEED);
+        delay(1000);
         state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else {
-        if(!distanceCenterSensor > 220 && !distanceCenterSensor < 400){
-          state = S_SCOUT;
-        }
         // If robot is inside borders. Check for contact or go straight forward
         if (check_for_contact()) {
           on_contact_made();
         } else {
+            //Stop chase if there is no target
+            if(distanceCenterSensor < 220){
+              state = S_SCOUT;
+            }
             motors.setSpeeds(speed, speed);
         }
       }
@@ -437,7 +455,7 @@ void loop()
       if(DEBUG){
         Serial.println("In Scout mode");
       }
-      if (distanceCenterSensor > 220 && distanceCenterSensor < 400) {
+      if (distanceCenterSensor > 220) {
         state = S_FIGHT;
       } else {
         motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
@@ -452,6 +470,7 @@ void loop()
     if (DEBUG) {
       Serial.println("In Test sensor mode");
       Serial.println(distanceCenterSensor);
+      delay(1000);
     }
     break;
 
@@ -463,5 +482,6 @@ void loop()
     unsigned long loopRunTime = millis();
     unsigned long timeNow = loopRunTime - loop_start_time;
     Serial.println(timeNow);
+    delay(100);
   }
 }
