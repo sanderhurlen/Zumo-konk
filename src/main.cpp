@@ -411,17 +411,20 @@ void loop()
       }
       if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
         // if leftmost sensor detects line, reverse and turn to the right
-        turn(RIGHT, true);
+        turn(RIGHT, false);
         state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
         // if rightmost sensor detects line, reverse and turn to the left
-        turn(LEFT, true);
+        turn(LEFT, false);
         state = S_SCOUT;
         //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
       }
       else {
+        if(!distanceCenterSensor > 220 && !distanceCenterSensor < 400){
+          state = S_SCOUT;
+        }
         // If robot is inside borders. Check for contact or go straight forward
         if (check_for_contact()) {
           on_contact_made();
