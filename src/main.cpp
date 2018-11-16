@@ -397,8 +397,8 @@ void loop()
     case S_STANDBY:
       if(DEBUG){
         Serial.println("In standby mode");
+        Serial.println(state);
       }
-      Serial.println(state);
       motors.setSpeeds(0, 0);
       waitForButtonAndCountDown();
       last_turn_time = millis();
@@ -426,11 +426,7 @@ void loop()
         if (check_for_contact()) {
           on_contact_made();
         } else {
-          if (distanceCenterSensor > 220 && distanceCenterSensor < 400) {
             motors.setSpeeds(speed, speed);
-          } else {
-            state = S_SCOUT;
-          }
         }
       }
     break;
