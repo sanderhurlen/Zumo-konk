@@ -28,6 +28,15 @@ const int TURN_SPEED =         250/SPEED_CONTROL;
 const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 
+// STATES
+
+const int S_STANDBY = 0;
+const int S_FIGHT = 1;
+const int S_SCOUT = 2;
+const int S_TEST_SENSOR = 3;
+
+int state = S_STANDBY;
+
 // Duration : Timing constants
 const int REVERSE_DURATION =   300; // ms
 const int TURN_DURATION =      250; // ms
@@ -115,17 +124,6 @@ const char sound_effect[] PROGMEM = "O4 T100 V15 L4 MS g12>c12>e12>G6>E12 ML>G2"
 ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
 ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
-
-
-// STATES
-
-const int S_STANDBY = 0;
-const int S_FIGHT = 1;
-const int S_SCOUT = 2;
-const int S_TEST_SENSOR = 3;
-
-int state = S_STANDBY;
-
 
 void setup()
 {
@@ -456,6 +454,9 @@ void loop()
       Serial.println(distanceCenterSensor);
     }
     break;
+
+    default:
+      state = S_SCOUT;
   }
   if(DEBUG){
     Serial.print("Loop run time is ");
