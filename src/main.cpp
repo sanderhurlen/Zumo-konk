@@ -2,6 +2,9 @@
 #include <Wire.h>
 #include <ZumoShield.h>
 
+// Debug: true for debugging
+bool DEBUG = true;
+
 //Quick shift variable for edge color. Black edge = > , white edge = <
 #define COLOR_EDGE >
 
@@ -418,11 +421,15 @@ void setup()
   //til hit?
   bool readyToStart = false;
   while(readyToStart == false){
+    //Wait for button to start battle phase
     waitForButtonAndCountDown();
   }
 }
 
-void loop(){//Wait for button to start battle phase
+void loop(){
+  if(DEBUG){
+    unsigned long startOfLoopTime = millis();
+  }
   //Attack if enemy in sight
   if(distanceSensor > 220){
     motor.setSpeeds(FULL_SPEED,FULL_SPEED);
@@ -439,5 +446,11 @@ void loop(){//Wait for button to start battle phase
   } else {
     //seeking for enemy
     motor.setSpeeds(-TURN_SPEED, TURN_SPEED);
+  }
+  if(DEBUG){
+    unsigned long endOfLoopTime = millis();
+    Serial.print("Loop run time: ");
+    Serial.print(startOfLoopTime-endOfLoopTime);
+    Serial.println(" ms");
   }
 }
