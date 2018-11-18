@@ -134,7 +134,7 @@ const int S_SCOUT = 2;
 
 int state = S_STANDBY;
 
-void waitForButtonAndCountDown()
+bool waitForButtonAndCountDown()
 {
   button.waitForPress();
   digitalWrite(ON_BOARD_LED, HIGH);
@@ -149,6 +149,7 @@ void waitForButtonAndCountDown()
   }
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);
+  return true;
 }
 
 
@@ -417,6 +418,10 @@ void setup()
   double distanceLeftSensor = constrain(valFromIRSensorLeft, 200, 800);
   double distanceRightSensor = constrain(valFromIRSensorRight, 200, 800);
   //til hit?
+  bool readyToStart = false;
+  while(readyToStart == false){
+    waitForButtonAndCountDown();
+  }
 }
 
 void loop()
