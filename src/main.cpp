@@ -413,13 +413,6 @@ void setup()
   _forwardSpeed = SlowSpeed;
   full_speed_start_time = 0;
   bool readyToStart = false;
-  while(readyToStart == false){
-    //Wait for button to start battle phase
-    waitForButtonAndCountDown();
-  }
-}
-
-void loop(){
   //kan ikke de neste linjene flyttes til setup?
   loop_start_time = millis();
   lsm303.readAcceleration(loop_start_time);
@@ -427,6 +420,13 @@ void loop(){
   int valFromIRSensor = analogRead(A0);
   double distanceSensor = constrain(valFromIRSensor, 200, 800);
   //til hit?
+  while(readyToStart == false){
+    //Wait for button to start battle phase
+    waitForButtonAndCountDown();
+  }
+}
+
+void loop(){
   unsigned long startOfLoopTime;
 
   if(DEBUG){
