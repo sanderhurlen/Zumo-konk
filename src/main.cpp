@@ -134,33 +134,6 @@ const int S_SCOUT = 2;
 
 int state = S_STANDBY;
 
-
-void setup()
-{
-  Wire.begin();
-
-  digitalWrite(6, HIGH);
-
-  // Initiate LSM303
-  lsm303.init();
-  lsm303.enable();
-  // uncomment if necessary to correct motor directions
-  //motors.flipLeftMotor(true);
-  //motors.flipRightMotor(true);
-
-  pinMode(ON_BOARD_LED, HIGH);
-
-  Serial.begin(9600);
-  lsm303.getLogHeader();
-
-  // reset loop variables
-  in_contact = false;  // 1 if contact made; 0 if no contact or contact lost
-  contact_made_time = 0;
-  last_turn_time = millis();  // prevents false contact detection on initial acceleration
-  _forwardSpeed = SlowSpeed;
-  full_speed_start_time = 0;
-}
-
 void waitForButtonAndCountDown()
 {
   button.waitForPress();
@@ -411,10 +384,31 @@ void turn(char direction, bool randomize) {
   last_turn_time = millis();
 }
 
-
-void loop()
+void setup()
 {
-//kan ikke de neste linjene flyttes til setup?
+  Wire.begin();
+
+  digitalWrite(6, HIGH);
+
+  // Initiate LSM303
+  lsm303.init();
+  lsm303.enable();
+  // uncomment if necessary to correct motor directions
+  //motors.flipLeftMotor(true);
+  //motors.flipRightMotor(true);
+
+  pinMode(ON_BOARD_LED, HIGH);
+
+  Serial.begin(9600);
+  lsm303.getLogHeader();
+
+  // reset loop variables
+  in_contact = false;  // 1 if contact made; 0 if no contact or contact lost
+  contact_made_time = 0;
+  last_turn_time = millis();  // prevents false contact detection on initial acceleration
+  _forwardSpeed = SlowSpeed;
+  full_speed_start_time = 0;
+  //kan ikke de neste linjene flyttes til setup?
   loop_start_time = millis();
   lsm303.readAcceleration(loop_start_time);
   sensors.read(sensor_values);
@@ -422,10 +416,10 @@ void loop()
   int valFromIRSensorRight = analogRead(A1);
   double distanceLeftSensor = constrain(valFromIRSensorLeft, 200, 800);
   double distanceRightSensor = constrain(valFromIRSensorRight, 200, 800);
-//til hit?
+  //til hit?
+}
 
-
-
+void loop()
 //Wait for button to start battle phase
 if(waitForButtonAndCountDown() && ){
       motors.setSpeeds(0, 0);
@@ -458,23 +452,16 @@ if(waitForButtonAndCountDown() && ){
       // https://acroname.com/articles/linearizing-sharp-ranger-data
 
       if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
-        // if leftmost sensor detects line, reverse and turn to the right
-        turn(RIGHT, true);
-        //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+        // if leftmost sensor detects line, reverse and turn to the
+        motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
       }
       else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
         // if rightmost sensor detects line, reverse and turn to the left
-        turn(LEFT, true);
-        //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
+        motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
       }
       else {
         // otherwise, go straight
-        //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED);
-        Serial.print("Distance is: ");
-        Serial.print(distanceLeftSensor);
-        Serial.print(" in state: ");
-        Serial.println(state);
-        delay(10);
+        //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED
 
         if (check_for_contact()) {
           on_contact_made();
