@@ -413,10 +413,8 @@ void setup()
   loop_start_time = millis();
   lsm303.readAcceleration(loop_start_time);
   sensors.read(sensor_values);
-  int valFromIRSensorLeft = analogRead(A0);
-  int valFromIRSensorRight = analogRead(A1);
-  double distanceLeftSensor = constrain(valFromIRSensorLeft, 200, 800);
-  double distanceRightSensor = constrain(valFromIRSensorRight, 200, 800);
+  int valFromIRSensor = analogRead(A0);
+  double distanceSensor = constrain(valFromIRSensorLeft, 200, 800);
   //til hit?
   bool readyToStart = false;
   while(readyToStart == false){
@@ -424,65 +422,22 @@ void setup()
   }
 }
 
-void loop()
-//Wait for button to start battle phase
-if(waitForButtonAndCountDown() && ){
-      motors.setSpeeds(0, 0);
-      state = S_FLIGHT;
-    break;
-
-    if(flight){
-
-      Serial.println(state);
-      Serial.print("Distance is: Left: ");
-      Serial.print(distanceLeftSensor);
-      Serial.print("Right: ");
-      Serial.print(distanceRightSensor);
-      Serial.print(" in state: ");
-      Serial.println(state);
-      delay(10);
-    }
-/*
-      if (distanceLeftSensor < 800) {
-        int volume = map(distanceLeftSensor, 125, 0, 3, 15);
-        buzzer.playNote(NOTE_G(4), 500, volume); //Volume jglp kdo
-      } else {
-        motors.setSpeeds(0, 0);
-        //motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-      }*/
-    break;
-
-    case S_SCOUT:
-
-      // https://acroname.com/articles/linearizing-sharp-ranger-data
-
-      if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
-        // if leftmost sensor detects line, reverse and turn to the
-        motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
-      }
-      else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
-        // if rightmost sensor detects line, reverse and turn to the left
-        motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
-      }
-      else {
-        // otherwise, go straight
-        //motors.setSpeeds(FORWARD_SPEED, FORWARD_SPEED
-
-        if (check_for_contact()) {
-          on_contact_made();
-        }
-
-        if (distanceLeftSensor < 800) {
-          int volume = map(distanceLeftSensor, 125, 0, 3, 15);
-          buzzer.playNote(NOTE_G(4), 500, volume); //Volume jglp kdo
-          int speed = getForwardSpeed();
-          motors.setSpeeds(speed, speed);
-        } else {
-          motors.setSpeeds(0, 0);
-          //motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
-        }
-      }
-
-    break;
+void loop(){//Wait for button to start battle phase
+  //Attack if enemy in sight
+  if(distanceSensor > 220){
+    motor.setSpeeds(FULL_SPEED,FULL_SPEED);
+  } else if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
+    // if leftmost sensor detects line, reverse and turn to the
+    motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
+    delay(REVERSE_DURATION);
+  } else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
+    // if rightmost sensor detects line, reverse and turn to the left
+    motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
+    delay(REVERSE_DURATION);
+  } else if (check_for_contact()) {
+    on_contact_made();
+  } else {
+    //seeking for enemy
+    motor.setSpeeds(-TURN_SPEED, TURN_SPEED);
   }
 }
