@@ -28,14 +28,14 @@ const int SPEED_CONTROL = 1;
 
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
-const int REVERSE_SPEED =      -250/SPEED_CONTROL;
+const int REVERSE_SPEED =      -350/SPEED_CONTROL;
 const int TURN_SPEED =         200/SPEED_CONTROL;
 const int FORWARD_SPEED =      100/SPEED_CONTROL;
 const int SEARCH_SPEED =       100/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 
 // Duration : Timing constants
-const int REVERSE_DURATION =   300; // ms
+const int REVERSE_DURATION =   500; // ms
 const int TURN_DURATION =      350; // ms
 
 // Timing for accelerometer
@@ -230,7 +230,7 @@ void on_contact_made()
   contact_made_time = loop_start_time;
   Serial.println(contact_made_time);
   setForwardSpeed(FullSpeed);
-  buzzer.playFromProgramSpace(sound_effect);
+  //buzzer.playFromProgramSpace(sound_effect);
 }
 
 // reset forward speed
@@ -470,7 +470,7 @@ void loop(){
     unsigned long endOfLoopTime = millis();
     if(endOfLoopTime != startOfLoopTime){
       Serial.print("Loop run time: ");
-      Serial.print(startOfLoopTime - endOfLoopTime);
+      Serial.print(endOfLoopTime - startOfLoopTime);
       Serial.println(" ms");
     } else {
       Serial.println("Super fast program. Loopruntime is ZERO!");
