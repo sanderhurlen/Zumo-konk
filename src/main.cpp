@@ -28,7 +28,7 @@ const int SPEED_CONTROL = 1;
 
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
-const int REVERSE_SPEED =      250/SPEED_CONTROL;
+const int REVERSE_SPEED =      -250/SPEED_CONTROL;
 const int TURN_SPEED =         200/SPEED_CONTROL;
 const int FORWARD_SPEED =      100/SPEED_CONTROL;
 const int SEARCH_SPEED =       100/SPEED_CONTROL;
@@ -434,12 +434,7 @@ void loop(){
   if(DEBUG){
    startOfLoopTime = millis();
   }
-  //Attack if enemy in sight
-  if(distanceSensor < 220){
-    motors.setSpeeds(FULL_SPEED,FULL_SPEED);
-    Serial.print("distanceSensor = ");
-    Serial.println(distanceSensor);
-  } else if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
+  if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
     // if leftmost sensor detects line, reverse and turn to the
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
     delay(REVERSE_DURATION);
@@ -447,13 +442,15 @@ void loop(){
     // if rightmost sensor detects line, reverse and turn to the left
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
     delay(REVERSE_DURATION);
-  } else if (check_for_contact()) {
-    on_contact_made();
-  } else if(distanceSensor < 220) {
-    //seeking for enemy
-    motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
   } else {
-    Serial.println("What the fakk");
+    if(distanceSensor > 220){
+      motors.setSpeeds(FULL_SPEED,FULL_SPEED);
+    } else if (check_for_contact()) {
+      Serial.println(distanceSensor);
+      on_contact_made();
+    } else {
+      motors.setSpeeds(SEARCH_SPEED, -SEARCH_SPEED);
+    }
   }
 
   if(DEBUG){
