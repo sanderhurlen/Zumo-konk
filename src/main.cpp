@@ -127,6 +127,12 @@ const int S_TEST_SENSOR = 3;
 
 int state = S_STANDBY;
 
+void plowDown(){
+  motors.speed(FULL_SPEED, FULL_SPEED);
+  delay(200);
+  motors.speed(REVERSE_SPEED, REVERSE_SPEED);
+  delay(200);
+}
 
 void setup()
 {
@@ -422,6 +428,7 @@ void loop()
       Serial.println(state);
       motors.setSpeeds(0, 0);
       waitForButtonAndCountDown();
+      plowDown();
       last_turn_time = millis();
       state = S_FIGHT;
     break;
