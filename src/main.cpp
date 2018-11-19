@@ -455,8 +455,12 @@ void loop(){
 
   if(DEBUG){
     unsigned long endOfLoopTime = millis();
-    Serial.print("Loop run time: ");
-    Serial.print(endOfLoopTime - startOfLoopTime);
-    Serial.println(" ms");
+    if(endOfLoopTime != startOfLoopTime){
+      Serial.print("Loop run time: ");
+      Serial.print(startOfLoopTime - endOfLoopTime);
+      Serial.println(" ms");
+    } else {
+      Serial.println("Super fast program. Loopruntime is ZERO!");
+    }
   }
 }
