@@ -28,7 +28,7 @@ const int SPEED_CONTROL = 1;
 
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
-const int REVERSE_SPEED =      250/SPEED_CONTROL;
+const int REVERSE_SPEED =      -250/SPEED_CONTROL;
 const int TURN_SPEED =         200/SPEED_CONTROL;
 const int FORWARD_SPEED =      100/SPEED_CONTROL;
 const int SEARCH_SPEED =       100/SPEED_CONTROL;
@@ -443,21 +443,20 @@ void loop(){
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
     delay(REVERSE_DURATION);
   } else {
-    if(distanceSensor < 220){
+    if(distanceSensor > 220){
       motors.setSpeeds(FULL_SPEED,FULL_SPEED);
-      Serial.print("distanceSensor = ");
     } else if (check_for_contact()) {
-      Seiral.println(distanceSensor);
+      Serial.println(distanceSensor);
       on_contact_made();
     } else {
-      motors.setSpeeds(FULL_SPEED,FULL_SPEED);
+      motors.setSpeeds(SEARCH_SPEED, -SEARCH_SPEED);
     }
   }
 
   if(DEBUG){
     unsigned long endOfLoopTime = millis();
     Serial.print("Loop run time: ");
-    Serial.print(startOfLoopTime - endOfLoopTime);
+    Serial.print(endOfLoopTime - startOfLoopTime);
     Serial.println(" ms");
   }
 }
