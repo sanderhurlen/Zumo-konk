@@ -159,7 +159,6 @@ bool waitForButtonAndCountDown()
   return true;
 }
 
-
 //Takes desired length of timeout and sets the global variable to hold the value.
 void startTimer(unsigned long timeout) {
   nextTimeout = millis() + timeout;
@@ -429,8 +428,9 @@ void loop(){
   } else {
     if(distanceSensor > 220){
       motors.setSpeeds(FULL_SPEED,FULL_SPEED);
-    } else if (check_for_contact()) {
-      Serial.println(distanceSensor);
+    }
+    else if (check_for_contact()) {
+      //HVA SKJER HER? HVORFOR?
       on_contact_made();
     } else {
       motors.setSpeeds(SEARCH_SPEED, -SEARCH_SPEED);
