@@ -3,7 +3,7 @@
 #include <ZumoShield.h>
 
 // Debug: true for debugging
-bool DEBUG = false;
+bool DEBUG = true;
 
 //Quick shift variable for edge color. Black edge = > , white edge = <
 #define COLOR_EDGE >
