@@ -156,7 +156,6 @@ bool waitForButtonAndCountDown()
   }
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);
-  plowDown();   // call plowdown function to pull the plow down from upward position
   return true;
 }
 
@@ -409,6 +408,7 @@ void setup()
   full_speed_start_time = 0;
   //Waiting for button to be pressed to start loop
   waitForButtonAndCountDown();
+  plowDown();   // call plowdown function to pull the plow down from upward position
 }
 
 void loop(){
