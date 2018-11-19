@@ -417,6 +417,7 @@ void loop()
 
   int speed = getForwardSpeed();
 
+  unsigned long startOfLoopTime;
   if(DEBUG){
     startOfLoopTime = millis();
   }
