@@ -412,7 +412,16 @@ void setup()
   last_turn_time = millis();  // prevents false contact detection on initial acceleration
   _forwardSpeed = SlowSpeed;
   full_speed_start_time = 0;
+/*
   bool readyToStart = false;
+  while(readyToStart == false){
+    //Wait for button to start battle phase
+  }
+  */
+  waitForButtonAndCountDown();
+}
+
+void loop(){
   //kan ikke de neste linjene flyttes til setup?
   loop_start_time = millis();
   lsm303.readAcceleration(loop_start_time);
@@ -420,21 +429,16 @@ void setup()
   int valFromIRSensor = analogRead(A0);
   double distanceSensor = constrain(valFromIRSensor, 200, 800);
   //til hit?
-  while(readyToStart == false){
-    //Wait for button to start battle phase
-    waitForButtonAndCountDown();
-  }
-}
-
-void loop(){
   unsigned long startOfLoopTime;
 
   if(DEBUG){
    startOfLoopTime = millis();
   }
   //Attack if enemy in sight
-  if(distanceSensor > 220){
+  if(distanceSensor < 220){
     motors.setSpeeds(FULL_SPEED,FULL_SPEED);
+    Serial.print("distanceSensor = ");
+    Seiral.println(distanceSensor);
   } else if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
     // if leftmost sensor detects line, reverse and turn to the
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
@@ -445,10 +449,13 @@ void loop(){
     delay(REVERSE_DURATION);
   } else if (check_for_contact()) {
     on_contact_made();
-  } else {
+  } else if(distanceSensor < 220) {
     //seeking for enemy
     motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
+  } else {
+    Serial.println("What the fakk");
   }
+
   if(DEBUG){
     unsigned long endOfLoopTime = millis();
     Serial.print("Loop run time: ");
