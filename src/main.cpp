@@ -23,7 +23,7 @@ const int SPEED_CONTROL = 1;
 // 0-400 : 400 Full speed
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
-const int REVERSE_SPEED =      250/SPEED_CONTROL;
+const int REVERSE_SPEED =      -250/SPEED_CONTROL;
 const int TURN_SPEED =         300/SPEED_CONTROL;
 const int SEARCH_SPEED =       300/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
@@ -127,6 +127,10 @@ const int S_TEST_SENSOR = 3;
 
 int state = S_STANDBY;
 
+void plowDown(){
+  motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
+  delay(300);
+}
 
 void setup()
 {
@@ -422,6 +426,7 @@ void loop()
       Serial.println(state);
       motors.setSpeeds(0, 0);
       waitForButtonAndCountDown();
+      plowDown();
       last_turn_time = millis();
       state = S_FIGHT;
     break;
