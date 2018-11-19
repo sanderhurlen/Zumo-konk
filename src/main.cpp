@@ -1,35 +1,39 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <ZumoShield.h>
+/* ––– Competition variables –––
+  bool DEBUG = false;
+  #define COLOR_EDGE = >
 
-// Debug: true for debugging
-bool DEBUG = true;
+  Remember to change following:
+  - Speed control -> 1
+*/
+bool DEBUG = true;                          // Debug: true for debugging
 
-//Quick shift variable for edge color. Black edge = > , white edge = <
-#define COLOR_EDGE >
+#define COLOR_EDGE >                        //Quick shift variable for edge color. Black edge = > , white edge = <
 
-//start condition in battle mode. True if flight first, false if not.
-bool flight;
-
-// Define pins to variable names
 const int ON_BOARD_LED = 13;
 
-const int NUM_SENSORS = 6;
-unsigned int sensor_values[NUM_SENSORS];
+// Sensor variables
+const int NUM_SENSORS = 6;                  // Number of light sensors on robot
+unsigned int sensor_values[NUM_SENSORS];    // Array to store sensor
 
-// this might need to be tuned for different lighting conditions, surfaces, etc.
-const int QTR_THRESHOLD = 1500; // microseconds
+const int QTR_THRESHOLD = 1500;             // microseconds, threshold for accelerometer :
 
-// Speeds: define different speed levels
-// 0-400 : 400 Full speed
+/*
+  SPEEDS: define different speed levels
+  0-400 : 400 Full speed
 
-//Value 1 for normal speed, value 2 for testing speed.
+  SPEEDCONTROL:
+  1 for normal speed
+  2 for testing speed.
+*/
 const int SPEED_CONTROL = 1;
 
 const int FULL_SPEED =         400/SPEED_CONTROL;
 const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
-const int REVERSE_SPEED =      -350/SPEED_CONTROL;
-const int TURN_SPEED =         200/SPEED_CONTROL;
+const int REVERSE_SPEED =      -350/SPEED_CONTROL; // negative value
+const int TURN_SPEED =         150/SPEED_CONTROL;
 const int FORWARD_SPEED =      100/SPEED_CONTROL;
 const int SEARCH_SPEED =       100/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
@@ -44,10 +48,6 @@ unsigned long last_turn_time;
 unsigned long contact_made_time;
 const int MIN_DELAY_AFTER_TURN     =    400;  // ms = min delay before detecting contact event
 const int MIN_DELAY_BETWEEN_CONTACTS =  1000;  // ms = min delay between detecting new contact event
-
-// Directions
-const int RIGHT = 1;
-const int LEFT = -1;
 
 // Accelerometer Settings
 const int RA_SIZE = 3;  // number of readings to include in running average of accelerometer readings
@@ -265,12 +265,6 @@ void Accelerometer::enable(void)
   writeAccReg(LSM303::CTRL_REG4_A, 0x08); // DLHC: enable high resolution mode
 }
 
-void Accelerometer::getLogHeader(void)
-{
-  Serial.print("millis    x      y     len     dir  | len_avg  dir_avg  |  avg_len");
-  Serial.println();
-}
-
 void Accelerometer::readAcceleration(unsigned long timestamp)
 {
   readAcc();
@@ -447,12 +441,8 @@ void loop(){
   if(DEBUG){
    startOfLoopTime = millis();
   }
-  if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
+  if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD || sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
     // if leftmost sensor detects line, reverse and turn to the
-    motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
-    delay(REVERSE_DURATION);
-  } else if (sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
-    // if rightmost sensor detects line, reverse and turn to the left
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
     delay(REVERSE_DURATION);
   } else {
