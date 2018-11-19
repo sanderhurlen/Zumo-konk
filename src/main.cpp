@@ -438,7 +438,7 @@ void loop(){
   if(distanceSensor < 220){
     motors.setSpeeds(FULL_SPEED,FULL_SPEED);
     Serial.print("distanceSensor = ");
-    Seiral.println(distanceSensor);
+    Serial.println(distanceSensor);
   } else if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
     // if leftmost sensor detects line, reverse and turn to the
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
@@ -458,8 +458,12 @@ void loop(){
 
   if(DEBUG){
     unsigned long endOfLoopTime = millis();
-    Serial.print("Loop run time: ");
-    Serial.print(startOfLoopTime - endOfLoopTime);
-    Serial.println(" ms");
+    if(endOfLoopTime != startOfLoopTime){
+      Serial.print("Loop run time: ");
+      Serial.print(startOfLoopTime - endOfLoopTime);
+      Serial.println(" ms");
+    } else {
+      Serial.println("Super fast program. Loopruntime is ZERO!");
+    }
   }
 }
