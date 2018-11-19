@@ -434,12 +434,7 @@ void loop(){
   if(DEBUG){
    startOfLoopTime = millis();
   }
-  //Attack if enemy in sight
-  if(distanceSensor < 220){
-    motors.setSpeeds(FULL_SPEED,FULL_SPEED);
-    Serial.print("distanceSensor = ");
-    Seiral.println(distanceSensor);
-  } else if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
+  if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD) {
     // if leftmost sensor detects line, reverse and turn to the
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
     delay(REVERSE_DURATION);
@@ -447,13 +442,16 @@ void loop(){
     // if rightmost sensor detects line, reverse and turn to the left
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
     delay(REVERSE_DURATION);
-  } else if (check_for_contact()) {
-    on_contact_made();
-  } else if(distanceSensor < 220) {
-    //seeking for enemy
-    motors.setSpeeds(-TURN_SPEED, TURN_SPEED);
   } else {
-    Serial.println("What the fakk");
+    if(distanceSensor < 220){
+      motors.setSpeeds(FULL_SPEED,FULL_SPEED);
+      Serial.print("distanceSensor = ");
+    } else if (check_for_contact()) {
+      Seiral.println(distanceSensor);
+      on_contact_made();
+    } else {
+      motors.setSpeeds(FULL_SPEED,FULL_SPEED);
+    }
   }
 
   if(DEBUG){
