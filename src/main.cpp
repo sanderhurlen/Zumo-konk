@@ -9,15 +9,13 @@
   - Speed control -> 1
 */
 bool DEBUG = true;                          // Debug: true for debugging
-
-#define COLOR_EDGE >                        //Quick shift variable for edge color. Black edge = > , white edge = <
-
-const int ON_BOARD_LED = 13;
+const int SPEED_CONTROL = 1;
+#define COLOR_EDGE >                        //Quick shift variable for edge color. Black edge = '>' , white edge = '<'
 
 // Sensor variables
+const int ON_BOARD_LED = 13;
 const int NUM_SENSORS = 6;                  // Number of light sensors on robot
 unsigned int sensor_values[NUM_SENSORS];    // Array to store sensor
-
 const int QTR_THRESHOLD = 1500;             // microseconds, threshold for accelerometer :
 
 /*
@@ -28,12 +26,10 @@ const int QTR_THRESHOLD = 1500;             // microseconds, threshold for accel
   1 for normal speed
   2 for testing speed.
 */
-const int SPEED_CONTROL = 1;
-
 const int FULL_SPEED =         400/SPEED_CONTROL;
-const int FULL_REVERSE_SPEED = 350/SPEED_CONTROL;
+const int FULL_REVERSE_SPEED = -400/SPEED_CONTROL;
 const int REVERSE_SPEED =      -350/SPEED_CONTROL; // negative value
-const int TURN_SPEED =         150/SPEED_CONTROL;
+const int TURN_SPEED =         250/SPEED_CONTROL;
 const int FORWARD_SPEED =      100/SPEED_CONTROL;
 const int SEARCH_SPEED =       100/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
@@ -57,8 +53,6 @@ enum ForwardSpeed { SearchSpeed, SustainedSpeed, FullSpeed, SlowSpeed };
 ForwardSpeed _forwardSpeed;  // current forward speed setting
 unsigned long full_speed_start_time;
 const int FULL_SPEED_DURATION_LIMIT   = 250;  // ms
-
-
 
 // RunningAverage class
 // based on RunningAverage library for Arduino
@@ -116,12 +110,9 @@ class Accelerometer : public LSM303
 
 Accelerometer lsm303;
 boolean in_contact;  // set when accelerometer detects contact with opposing robot
-
 // ––– END–––– Accelerometer - CLASS –––
 
-
 ZumoBuzzer buzzer;
-const char sound_effect[] PROGMEM = "O4 T100 V15 L4 MS g12>c12>e12>G6>E12 ML>G2"; // "charge" melody
  // use V0 to suppress sound effect; v15 for max volume
 ZumoMotors motors;
 Pushbutton button(ZUMO_BUTTON); // pushbutton on pin 12
@@ -131,7 +122,6 @@ ZumoReflectanceSensorArray sensors(QTR_NO_EMITTER_PIN);
 unsigned int nextTimeout = 0;
 
 // STATES
-
 const int S_STANDBY = 0;
 const int S_FLIGHT = 1;
 const int S_SCOUT = 2;
@@ -231,7 +221,6 @@ void on_contact_made()
   contact_made_time = loop_start_time;
   Serial.println(contact_made_time);
   setForwardSpeed(FullSpeed);
-  //buzzer.playFromProgramSpace(sound_effect);
 }
 
 // reset forward speed
@@ -401,8 +390,6 @@ void setup()
 {
   Wire.begin();
 
-  digitalWrite(6, HIGH);
-
   // Initiate LSM303
   lsm303.init();
   lsm303.enable();
@@ -410,7 +397,7 @@ void setup()
   //motors.flipLeftMotor(true);
   //motors.flipRightMotor(true);
 
-  pinMode(ON_BOARD_LED, HIGH);
+  pinMode(ON_BOARD_LED, OUTPUT);
 
   Serial.begin(9600);
 
@@ -420,12 +407,7 @@ void setup()
   last_turn_time = millis();  // prevents false contact detection on initial acceleration
   _forwardSpeed = SlowSpeed;
   full_speed_start_time = 0;
-/*
-  bool readyToStart = false;
-  while(readyToStart == false){
-    //Wait for button to start battle phase
-  }
-  */
+  //Waiting for button to be pressed to start loop
   waitForButtonAndCountDown();
 }
 
@@ -435,7 +417,6 @@ void loop(){
   sensors.read(sensor_values);
   int valFromIRSensor = analogRead(A0);
   double distanceSensor = constrain(valFromIRSensor, 200, 800);
-  //til hit?
   unsigned long startOfLoopTime;
 
   if(DEBUG){
