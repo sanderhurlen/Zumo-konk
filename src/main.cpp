@@ -42,6 +42,7 @@ int state = S_STANDBY;
 int lineHitCounter = 0;
 
 // Duration : Timing constants
+unsigned long nextTimeout = 0;
 const int REVERSE_DURATION =   300; // ms
 const int TURN_DURATION =      250; // ms
 
@@ -389,6 +390,30 @@ void turn(char direction, bool randomize) {
   last_turn_time = millis();
 }
 
+/*
+  Timer functions:
+  Takes desired length of timeout and sets the global variable to hold the value.
+*/
+
+void startTimer(unsigned long timeout) {
+  nextTimeout = millis() + timeout;
+}
+
+/*
+  Checks if the timeout has expired. Uses startTimer to set a value of timeout.
+*/
+
+bool isTimerExpired() {
+  bool timerHasExpired = false;
+
+  if (millis() > nextTimeout) {
+    timerHasExpired = true;
+  } else {
+    timerHasExpired = false;
+  }
+  return timerHasExpired;
+}
+
 
 void loop()
 {
@@ -403,6 +428,11 @@ void loop()
   double distanceCenterSensor = constrain(valFromIRSensorCenter, 200, 800);
 
   int speed = getForwardSpeed();
+
+  unsigned long startOfLoopTime;
+  if(DEBUG){
+    startOfLoopTime = millis();
+  }
 
   switch (state) {
     case S_STANDBY:
@@ -483,5 +513,15 @@ void loop()
     unsigned long timeNow = loopRunTime - loop_start_time;
     Serial.println(timeNow);
     delay(100);
+  }
+  if(DEBUG){
+    unsigned long endOfLoopTime = millis();
+    if(endOfLoopTime != startOfLoopTime){
+      Serial.print("Loop run time: ");
+      Serial.print(endOfLoopTime - startOfLoopTime);
+      Serial.println(" ms");
+    } else {
+      Serial.println("Super fast program. Loopruntime is ZERO!");
+    }
   }
 }
