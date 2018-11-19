@@ -86,6 +86,7 @@ class RunningAverage
 /*  –––– Accelerometer - CLASS ––––
 //extends the LSM303 Library to support reading and averaging the x-y acceleration
 //   vectors from the onboard LSM303DLHC accelerometer/magnetometer
+*/
 class Accelerometer : public LSM303
 {
   typedef struct acc_data_xy
@@ -100,7 +101,6 @@ class Accelerometer : public LSM303
     Accelerometer() : ra_x(RA_SIZE), ra_y(RA_SIZE) {};
     ~Accelerometer() {};
     void enable(void);
-    void getLogHeader(void);
     void readAcceleration(unsigned long timestamp);
     float len_xy() const;
     float dir_xy() const;
@@ -117,7 +117,7 @@ class Accelerometer : public LSM303
 Accelerometer lsm303;
 boolean in_contact;  // set when accelerometer detects contact with opposing robot
 
-––– END–––– Accelerometer - CLASS ––– */
+// ––– END–––– Accelerometer - CLASS –––
 
 
 ZumoBuzzer buzzer;
@@ -413,7 +413,6 @@ void setup()
   pinMode(ON_BOARD_LED, HIGH);
 
   Serial.begin(9600);
-  lsm303.getLogHeader();
 
   // reset loop variables
   in_contact = false;  // 1 if contact made; 0 if no contact or contact lost
