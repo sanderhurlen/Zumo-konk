@@ -83,7 +83,8 @@ class RunningAverage
     static T zero;
 };
 
-// Accelerometer Class -- extends the LSM303 Library to support reading and averaging the x-y acceleration
+/*  –––– Accelerometer - CLASS ––––
+//extends the LSM303 Library to support reading and averaging the x-y acceleration
 //   vectors from the onboard LSM303DLHC accelerometer/magnetometer
 class Accelerometer : public LSM303
 {
@@ -116,7 +117,7 @@ class Accelerometer : public LSM303
 Accelerometer lsm303;
 boolean in_contact;  // set when accelerometer detects contact with opposing robot
 
-// –––––––––––––––––––––––––––––––––––––
+––– END–––– Accelerometer - CLASS ––– */
 
 
 ZumoBuzzer buzzer;
