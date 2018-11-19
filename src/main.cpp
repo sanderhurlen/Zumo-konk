@@ -137,6 +137,19 @@ const int S_SCOUT = 2;
 
 int state = S_STANDBY;
 
+/*
+  Pulls robot fast in reverse speed to get the plow down.
+*/
+
+void plowDown(){
+  motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
+  delay(300);
+}
+
+/*
+  Waits for button to be pressed and initiate start sequence
+*/
+
 bool waitForButtonAndCountDown()
 {
   button.waitForPress();
@@ -152,6 +165,7 @@ bool waitForButtonAndCountDown()
   }
   delay(1000);
   buzzer.playNote(NOTE_G(4), 500, 15);
+  plowDown();   // call plowdown function to pull the plow down from upward position
   return true;
 }
 
@@ -422,7 +436,6 @@ void setup()
 }
 
 void loop(){
-  //kan ikke de neste linjene flyttes til setup?
   loop_start_time = millis();
   lsm303.readAcceleration(loop_start_time);
   sensors.read(sensor_values);
