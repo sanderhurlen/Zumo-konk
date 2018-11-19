@@ -417,6 +417,10 @@ void loop()
 
   int speed = getForwardSpeed();
 
+  if(DEBUG){
+    startOfLoopTime = millis();
+  }
+
   switch (state) {
     case S_STANDBY:
       Serial.println(state);
@@ -470,5 +474,15 @@ void loop()
       Serial.println(distanceCenterSensor);
     }
     break;
+  }
+  if(DEBUG){
+    unsigned long endOfLoopTime = millis();
+    if(endOfLoopTime != startOfLoopTime){
+      Serial.print("Loop run time: ");
+      Serial.print(endOfLoopTime - startOfLoopTime);
+      Serial.println(" ms");
+    } else {
+      Serial.println("Super fast program. Loopruntime is ZERO!");
+    }
   }
 }
