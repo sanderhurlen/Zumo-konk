@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <ZumoShield.h>
+
 /* ––– Competition variables –––
   bool DEBUG = false;
   #define COLOR_EDGE = >
@@ -8,9 +9,10 @@
   Remember to change following:
   - Speed control -> 1
 */
-bool DEBUG = true;                          // Debug: true for debugging
+bool DEBUG = false;
+bool DEBUG_SENSOR = false;                         // Debug: true for debugging
 const int SPEED_CONTROL = 1;
-#define COLOR_EDGE >                        //Quick shift variable for edge color. Black edge = '>' , white edge = '<'
+#define COLOR_EDGE <                        //Quick shift variable for edge color. Black edge = '>' , white edge = '<'
 
 // Sensor variables
 const int ON_BOARD_LED = 13;
@@ -31,7 +33,7 @@ const int FULL_REVERSE_SPEED = -400/SPEED_CONTROL;
 const int REVERSE_SPEED =      -350/SPEED_CONTROL; // negative value
 const int TURN_SPEED =         250/SPEED_CONTROL;
 const int FORWARD_SPEED =      100/SPEED_CONTROL;
-const int SEARCH_SPEED =       250/SPEED_CONTROL;
+const int SEARCH_SPEED =       200/SPEED_CONTROL;
 
 // Duration : Timing constants
 const int REVERSE_DURATION =   500; // ms
@@ -89,49 +91,52 @@ bool waitForButtonAndCountDown()
 
 void setup()
 {
-  Wire.begin();
-
-  // Initiate LSM303
-  lsm303.init();
-  lsm303.enable();
-  // uncomment if necessary to correct motor directions
-  //motors.flipLeftMotor(true);
-  //motors.flipRightMotor(true);
+  //Wire.begin();
 
   pinMode(ON_BOARD_LED, OUTPUT);
 
+  if(DEBUG || DEBUG_SENSOR){
   Serial.begin(9600);
+  }
 
-  // reset loop variables
-  in_contact = false;  // 1 if contact made; 0 if no contact or contact lost
-  contact_made_time = 0;
-  last_turn_time = millis();  // prevents false contact detection on initial acceleration
-  _forwardSpeed = SlowSpeed;
-  full_speed_start_time = 0;
   //Waiting for button to be pressed to start loop
   waitForButtonAndCountDown();
   plowDown();   // call plowdown function to pull the plow down from upward position
 }
 
 void loop(){
+  //Debug varialbe to time loop runtime
   unsigned long startOfLoopTime;
+
+  //Stores reflectans sensor readings
   sensors.read(sensor_values);
+
+  //Take readings from IR sensor
   int valFromIRSensor = analogRead(A0);
+  
+  //Constraining readings from IR to avoid spikes
   double distanceSensor = constrain(valFromIRSensor, 200, 800);
 
   if(DEBUG){
    startOfLoopTime = millis();
   }
+  //Check if the bot is on border else go to search/attack stage
   if (sensor_values[0] COLOR_EDGE QTR_THRESHOLD || sensor_values[5] COLOR_EDGE QTR_THRESHOLD) {
-    // if leftmost sensor detects line, reverse and turn to the
     motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
     delay(REVERSE_DURATION);
   } else {
-    if(distanceSensor > 220){
+    //If target is within range give full speed ahead.
+    if(distanceSensor > 204){
       motors.setSpeeds(FULL_SPEED,FULL_SPEED);
+    //If no target within range, scan for target by spinning around
     } else {
       motors.setSpeeds(SEARCH_SPEED, -SEARCH_SPEED);
     }
+  }
+
+  if(DEBUG_SENSOR){
+    Serial.println(distanceSensor);
+    delay(100);
   }
 
   if(DEBUG){
