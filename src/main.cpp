@@ -31,7 +31,7 @@ const int FULL_REVERSE_SPEED = -400/SPEED_CONTROL;
 const int REVERSE_SPEED =      -350/SPEED_CONTROL; // negative value
 const int TURN_SPEED =         250/SPEED_CONTROL;
 const int FORWARD_SPEED =      100/SPEED_CONTROL;
-const int SEARCH_SPEED =       100/SPEED_CONTROL;
+const int SEARCH_SPEED =       250/SPEED_CONTROL;
 const int SUSTAINED_SPEED =    50/SPEED_CONTROL; // switches to SUSTAINED_SPEED from FULL_SPEED after FULL_SPEED_DURATION_LIMIT ms
 
 // Duration : Timing constants
@@ -134,7 +134,7 @@ int state = S_STANDBY;
 
 void plowDown(){
   motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
-  delay(300);
+  delay(100);
 }
 
 /*
