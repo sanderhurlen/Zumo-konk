@@ -59,9 +59,8 @@ const int S_SCOUT = 2;
 int state = S_STANDBY;
 
 /*
-  Pulls robot fast in reverse speed to get the plow down.
+  Function to pull robot fast in reverse speed to get the plow down.
 */
-
 void plowDown(){
   motors.setSpeeds(REVERSE_SPEED, REVERSE_SPEED);
   delay(100);
@@ -70,7 +69,6 @@ void plowDown(){
 /*
   Waits for button to be pressed and initiate start sequence
 */
-
 bool waitForButtonAndCountDown()
 {
   button.waitForPress();
@@ -91,13 +89,12 @@ bool waitForButtonAndCountDown()
 
 void setup()
 {
+  if(DEBUG || DEBUG_SENSOR){
+    Serial.begin(9600);
+  }
   //Wire.begin();
 
   pinMode(ON_BOARD_LED, OUTPUT);
-
-  if(DEBUG || DEBUG_SENSOR){
-  Serial.begin(9600);
-  }
 
   //Waiting for button to be pressed to start loop
   waitForButtonAndCountDown();
@@ -113,7 +110,7 @@ void loop(){
 
   //Take readings from IR sensor
   int valFromIRSensor = analogRead(A0);
-  
+
   //Constraining readings from IR to avoid spikes
   double distanceSensor = constrain(valFromIRSensor, 200, 800);
 
